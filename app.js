@@ -1,5 +1,5 @@
 const express = require('express')
-const bodyParser = require('body-parser')
+const icr = require('image-resize-compress')
 
 // route
 
@@ -13,9 +13,12 @@ app.use((req, res, next) => {
   next()
 })
 
-app.use(bodyParser.json())
+app.use(express.json())
 
 //route
+// eslint-disable-next-line no-unused-vars
+app.use('/test/', (req, res, next) => {
+  icr.urlToBlob('https://upload.wikimedia.org/wikipedia/commons/3/34/Renault_T-Truck_-_E_5958KC.jpg').then((file) => console.log(file))})
 //auth
 
 module.exports = app
