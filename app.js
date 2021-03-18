@@ -1,5 +1,5 @@
 const express = require('express')
-const icr = require('image-resize-compress')
+const icr = require('./lib/image-resize-compress')
 
 // route
 

@@ -1,0 +1,82 @@
+{
+  "_from": "image-resize-compress",
+  "_id": "image-resize-compress@1.0.8",
+  "_inBundle": false,
+  "_integrity": "sha512-4RZZnk+qv1LZlxiDe3MxBRUAoc2xicS3Xny0e7AtzRz9k8D9P/72vKxxenCKFzM8TjreHYoE+rqQS4u+DobhNQ==",
+  "_location": "/image-resize-compress",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "image-resize-compress",
+    "name": "image-resize-compress",
+    "escapedName": "image-resize-compress",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/image-resize-compress/-/image-resize-compress-1.0.8.tgz",
+  "_shasum": "194c15eb93b0afb5b29654a7239f4b3cd44ec380",
+  "_spec": "image-resize-compress",
+  "_where": "/home/devon/Documents/DEV/compressor",
+  "author": {
+    "name": "Alef Duarte"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/alefduarte/image-resize-compress/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {},
+  "deprecated": false,
+  "description": "Image resizer, compressor and converter",
+  "devDependencies": {
+    "@babel/core": "^7.10.3",
+    "@babel/preset-env": "^7.10.3",
+    "babel-loader": "^8.1.0",
+    "eslint": "^7.3.0",
+    "eslint-config-airbnb": "18.2.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.0.5",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "homepage": "https://github.com/alefduarte/image-resize-compress#readme",
+  "keywords": [
+    "image",
+    "resize",
+    "compress",
+    "reduce",
+    "png",
+    "jpeg",
+    "webp",
+    "react"
+  ],
+  "license": "MIT",
+  "main": "src/index.js",
+  "name": "image-resize-compress",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alefduarte/image-resize-compress.git"
+  },
+  "scripts": {
+    "build": "webpack --mode production",
+    "prepare": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.8"
+}
