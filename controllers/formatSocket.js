@@ -1,10 +1,24 @@
 const compress_images = require("compress-images");
 const OUTPUT_path = "./comp-img/comp-";
 
-
 // eslint-disable-next-line no-undef
 const ENV = process.env;
 
+let AllCompressPictures = {};
+
+/**
+ * 
+ * @param {*} compressPicturesId 
+ * @param {*} dataCompressPictures 
+ */
+exports.addCompressPicture = (compressPicturesId, dataCompressPictures) => {
+    AllCompressPictures[compressPicturesId] = dataCompressPictures;
+};
+
+/**
+ * Fonction de log de reception de la requête.
+ * @param {Object} req - Objet req de Express, contient les methodes de traitement des requêtes
+ */
 const logFileReqReport = (req) => {
     if (ENV.MODE === "development") {
         console.log("Process starting ...");
@@ -15,7 +29,13 @@ const logFileReqReport = (req) => {
         console.log("req.file.path :", req.file.path);
     }
 };
-
+/**
+ * 
+ * Fonction de log du process de compression
+ * @param {Function} error -  fonction error de compress_image
+ * @param {Function} completed - fonction completed de compress_image
+ * @param {Function} statistic - fonction statistic de compress_image
+ */
 const logCompressReport = (error, completed, statistic) => {
     if (ENV.MODE === "development") { 
         console.log("Rapport de compression :");
@@ -28,7 +48,16 @@ const logCompressReport = (error, completed, statistic) => {
     }
 };
 
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} tcomp 
+ */
 const compressPicture = (req, res, tcomp) => {
+    const compressPictureId = req.body.compressPictureId;
+
+    res.status(200).json({response: `compression de l'image: ${req.file.filename} en cour...`});
     let mineTypePicture = "";
 
     switch (req.file.mimetype) {
@@ -75,7 +104,24 @@ const compressPicture = (req, res, tcomp) => {
             if (ENV.MODE === "development") {
                 console.log("picktureLink : ", pinctureLink);
             }
-            res.status(200).json({pictureLink: pinctureLink, filename : req.file.filename});
+
+
+            // envoie de l'url par web socket
+            AllCompressPictures[compressPictureId].client.emit("conpressOnePictureFinish", JSON.stringify(pinctureLink));
+
+            //ancienne version format.js
+            // res.status(200).json({pictureLink: pinctureLink, filename : req.file.filename});
+
+            //décrémenter le nombre d'image restant à compresser
+            AllCompressPictures[compressPictureId].numberOfPictures -= 1;
+            console.log("NOMBRE RESTANT D IMAGE A COMPRESSER", AllCompressPictures[compressPictureId].numberOfPictures);
+            if (AllCompressPictures[compressPictureId].numberOfPictures <= 0) {
+                AllCompressPictures[compressPictureId].client.emit("compressAllPicturesFinish");
+
+                // A FAIRE: désabonnement du web socket
+
+            }
+
         });
 };
 
