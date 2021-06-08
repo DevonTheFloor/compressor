@@ -6,6 +6,7 @@ const formatRoutes = require("./routes/format");
 const formatSocketRoutes = require("./routes/formatSocket");
 const handleImagesRoutes = require("./routes/handleImages");
 const userRoutes = require("./routes/auth");
+const repositoryRoutes = require("./routes/repository");
 
 // eslint-disable-next-line no-undef
 const ENV = process.env;
