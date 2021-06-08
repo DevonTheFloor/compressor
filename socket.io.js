@@ -11,7 +11,7 @@ exports.start = (io) => {
         // reception de la demande de compression d'images
         client.on("startCompressFiles", (compressPictureData) => {
             const dataReceived = JSON.parse(compressPictureData);
-
+            
             const compressPictureId = Date.now();
 
             const dataCompressPictures = {

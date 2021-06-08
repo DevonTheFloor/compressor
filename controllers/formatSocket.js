@@ -6,11 +6,19 @@ const ENV = process.env;
 
 let AllCompressPictures = {};
 
-
+/**
+ * 
+ * @param {*} compressPicturesId 
+ * @param {*} dataCompressPictures 
+ */
 exports.addCompressPicture = (compressPicturesId, dataCompressPictures) => {
     AllCompressPictures[compressPicturesId] = dataCompressPictures;
 };
 
+/**
+ * Fonction de log de reception de la requête.
+ * @param {Object} req - Objet req de Express, contient les methodes de traitement des requêtes
+ */
 const logFileReqReport = (req) => {
     if (ENV.MODE === "development") {
         console.log("Process starting ...");
@@ -21,7 +29,13 @@ const logFileReqReport = (req) => {
         console.log("req.file.path :", req.file.path);
     }
 };
-
+/**
+ * 
+ * Fonction de log du process de compression
+ * @param {Function} error -  fonction error de compress_image
+ * @param {Function} completed - fonction completed de compress_image
+ * @param {Function} statistic - fonction statistic de compress_image
+ */
 const logCompressReport = (error, completed, statistic) => {
     if (ENV.MODE === "development") { 
         console.log("Rapport de compression :");
@@ -34,6 +48,12 @@ const logCompressReport = (error, completed, statistic) => {
     }
 };
 
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} tcomp 
+ */
 const compressPicture = (req, res, tcomp) => {
     const compressPictureId = req.body.compressPictureId;
 

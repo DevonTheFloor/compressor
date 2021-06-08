@@ -5,6 +5,7 @@ const formatRoutes = require("./routes/format");
 const formatSocketRoutes = require("./routes/formatSocket");
 const handleImagesRoutes = require("./routes/handleImages");
 
+// eslint-disable-next-line no-undef
 const ENV = process.env;
 
 const app = express();
@@ -33,6 +34,8 @@ app.use("/api/handleImages", handleImagesRoutes);
 // *** START STATIC SERVE
 
 //picture compress
+
+// eslint-disable-next-line no-undef
 app.use("/assets", express.static(path.join(__dirname, ENV.FOLDER_PIC_COMPRESS)));
 
 // STATIC SERVE FINISH ***
