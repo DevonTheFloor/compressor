@@ -81,4 +81,22 @@ exports.login = (req, res) => {
             }
         })
         .catch(error => res.status(500).json(error));
+};
+
+exports.getUser = (req, res) => {
+    const userId = req.params.userId;
+    User.findOne({ _id: userId})
+        .then(user => {
+            if(!user) {
+                return res.status(401).json({ message: "Utilisateur non trouvé !" });
+            }else {
+                res.status(200).json({
+                    userId: user._id,
+                    pseudo: user.pseudo,
+                    email: user.email,
+                });
+            }
+  
+        })
+        .catch(error => res.status(500).json(error));
 }; 
