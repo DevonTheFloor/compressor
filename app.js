@@ -7,6 +7,7 @@ const formatSocketRoutes = require("./routes/formatSocket");
 const handleImagesRoutes = require("./routes/handleImages");
 const userRoutes = require("./routes/auth");
 const repositoryRoutes = require("./routes/repository");
+const pictureRoutes = require("./routes/picture");
 
 // eslint-disable-next-line no-undef
 const ENV = process.env;
@@ -42,7 +43,8 @@ app.use("/api/onepic/multi", formatSocketRoutes);
 app.use("/api/handleImages", handleImagesRoutes);
 // repository
 app.use("/api/repository", repositoryRoutes);
-
+// picture
+app.use("/api/picture", pictureRoutes);
 //ROUTE API FINISH***
 
 
