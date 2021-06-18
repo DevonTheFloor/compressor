@@ -99,10 +99,10 @@ const compressPicture = (req, res, tcomp) => {
         function logg (error, completed, statistic) {
             
             logCompressReport(error, completed, statistic);
-            const pinctureLink = `http://${ENV.HOST}:${ENV.PORT}/assets/${ENV.PICTURE_PREFIX + req.file.filename}`;
+            const pinctureUrl = `http://${ENV.HOST}:${ENV.PORT}/assets/${ENV.PICTURE_PREFIX + req.file.filename}`;
 
             if (ENV.MODE === "development") {
-                console.log("picktureLink : ", pinctureLink);
+                console.log("picktureLink : ", pinctureUrl);
             }
 
 
