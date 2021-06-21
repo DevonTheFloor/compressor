@@ -1,5 +1,5 @@
 const express = require("express");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const path = require("path");
 // route
 const formatRoutes = require("./routes/format");
@@ -13,13 +13,13 @@ const ENV = process.env;
 
 const app = express();
 
-mongoose.connect(ENV.connectMongoose,
+mongoose.connect(ENV.CONNECT_MONGOOSE,
     { useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true
-     })
-    .then(() => console.log('Connexion à MongoDB réussie !'))
-    .catch(() => console.log('Connexion à MongoDB échouée !'));
+        useUnifiedTopology: true,
+        useCreateIndex: true
+    })
+    .then(() => console.log("Connexion à MongoDB réussie !"))
+    .catch(() => console.log("Connexion à MongoDB échouée !"));
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");

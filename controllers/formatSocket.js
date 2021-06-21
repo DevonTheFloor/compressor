@@ -74,9 +74,10 @@ const compressPicture = (currentOperation, compressRatio, file) => {
     const INPUT_path = `./${file.path}`;
     const OUTPUT_path = "./comp-img/comp-";
     const extentionFile = getExtentionFile(mimetype);
+    console.log("ratio :", compressRatio);
 
     logPreCompresse(mimetype, extentionFile, INPUT_path);
-    
+    console.log("tcomp :", compressRatio);
     // dépendance: node_module compress-images
     compressImages(
         INPUT_path,
@@ -87,6 +88,10 @@ const compressPicture = (currentOperation, compressRatio, file) => {
         { png: { engine: extentionFile === "png"? "pngquant": false, command: ["--quality=10-"+compressRatio, "-o"] } },
         { svg: { engine: extentionFile === "svg"? "svgo": false, command: "--multipass" } },
         { gif: { engine: extentionFile === "gif"? "gifsicle": false, command: ["--colors", compressRatio, "--use-col=web"] } },
+        /* { jpg: { engine: "mozjpeg", command: ["-quality", "60"] } },
+        { png: { engine: "pngquant", command: ["--quality=20-50", "-o"] } },
+        { svg: { engine: "svgo", command: "--multipass" } },
+        { gif: { engine: "gifsicle", command: ["--colors", "64", "--use-col=web"] } }, */
         function(error, completed, statistic) {
 
             logCompressReport(error, completed, statistic);
