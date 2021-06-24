@@ -1,16 +1,10 @@
-const compress_images = require("compress-images");
-const OUTPUT_path = "./comp-img/comp-";
+const compressImages = require("compress-images");
 
 // eslint-disable-next-line no-undef
 const ENV = process.env;
 
 let AllCompressPictures = {};
 
-/**
- * 
- * @param {*} compressPicturesId 
- * @param {*} dataCompressPictures 
- */
 exports.addCompressPicture = (compressPicturesId, dataCompressPictures) => {
     AllCompressPictures[compressPicturesId] = dataCompressPictures;
 };
@@ -24,18 +18,20 @@ const logFileReqReport = (req) => {
         console.log("Process starting ...");
         console.log("req.file :", req.file);
         console.log("req.body :", req.body);
-        console.log("T comp :", req.body.rangeValue);
+        console.log("T comp :", req.body.compressRatio);
         console.log("req.file.filename: ", req.file.filename);
         console.log("req.file.path :", req.file.path);
     }
 };
-/**
- * 
- * Fonction de log du process de compression
- * @param {Function} error -  fonction error de compress_image
- * @param {Function} completed - fonction completed de compress_image
- * @param {Function} statistic - fonction statistic de compress_image
- */
+
+const logPreCompresse = (mimetype, extentionFile, INPUT_path) => {
+    if (ENV.MODE === "development") { 
+        console.log("MIMETYPE : ", mimetype);
+        console.log("EXT_FILE : ", extentionFile);
+        console.log("input path :", INPUT_path);
+    }
+};
+
 const logCompressReport = (error, completed, statistic) => {
     if (ENV.MODE === "development") { 
         console.log("Rapport de compression :");
@@ -48,100 +44,103 @@ const logCompressReport = (error, completed, statistic) => {
     }
 };
 
-/**
- * 
- * @param {*} req 
- * @param {*} res 
- * @param {*} tcomp 
- */
-const compressPicture = (req, res, tcomp) => {
-    const compressPictureId = req.body.compressPictureId;
-
-    res.status(200).json({response: `compression de l'image: ${req.file.filename} en cour...`});
-    let mineTypePicture = "";
-
-    switch (req.file.mimetype) {
+const getExtentionFile = (mimetype) => {
+    switch (mimetype) {
     case "image/jpg":
-        mineTypePicture = "jpg";
-        break;
+        return "jpg";
     case "image/jpeg":
-        mineTypePicture = "jpg";
-        break;
+        return "jpg";
     case "image/png":
-        mineTypePicture = "png";
-        break;
+        return "png";
     case "image/gif":
-        mineTypePicture = "gif";
-        break;
+        return "gif";
     case "image/svg":
-        mineTypePicture = "svg";
-        break;
+        return "svg";
     case "image/svg+xml":
-        mineTypePicture = "svg";
-        break;
+        return"svg";
     default:
-        break;
+        return null;
     }
-    if (ENV.MODE === "development") { 
-        console.log("MIMETYPE : ", req.file.mimetype);
-        console.log("MIMETYPE : ", mineTypePicture);
-    }
-    let INPUT_path = "./"+req.file.path;
-    tcomp = req.body.rangeValue;
-    if (ENV.MODE === "development") { 
-        console.log("input path :", INPUT_path);
-    }
-    compress_images( INPUT_path, OUTPUT_path, { compress_force: false, statistic: true, autoupdate: true }, false,
-        { jpg: { engine: mineTypePicture === "jpg"? "mozjpeg": false, command: ["-quality", tcomp ] } },
-        { png: { engine: mineTypePicture === "png"? "pngquant": false, command: ["--quality=10-"+tcomp, "-o"] } },
-        { svg: { engine: mineTypePicture === "svg"? "svgo": false, command: "--multipass" } },
-        { gif: { engine: mineTypePicture === "gif"? "gifsicle": false, command: ["--colors", tcomp, "--use-col=web"] } },
-        function logg (error, completed, statistic) {
-            
+};
+
+const compressPicture = (currentOperation, compressRatio, file) => {
+    const mimetype = file.mimetype;
+    const filename = file.filename;
+    const INPUT_path = `./${file.path}`;
+    const OUTPUT_path = "./comp-img/comp-";
+    const extentionFile = getExtentionFile(mimetype);
+
+    logPreCompresse(mimetype, extentionFile, INPUT_path);
+    
+    // dépendance: node_module compress-images
+    compressImages(
+        INPUT_path,
+        OUTPUT_path,
+        { compress_force: false, statistic: true, autoupdate: true },
+        false,
+        { jpg: { engine: extentionFile === "jpg"? "mozjpeg": false, command: ["-quality", compressRatio ] } },
+        { png: { engine: extentionFile === "png"? "pngquant": false, command: ["--quality=10-"+compressRatio, "-o"] } },
+        { svg: { engine: extentionFile === "svg"? "svgo": false, command: "--multipass" } },
+        { gif: { engine: extentionFile === "gif"? "gifsicle": false, command: ["--colors", compressRatio, "--use-col=web"] } },
+        function(error, completed, statistic) {
+
             logCompressReport(error, completed, statistic);
-            const pinctureLink = `http://${ENV.HOST}:${ENV.PORT}/assets/${ENV.PICTURE_PREFIX + req.file.filename}`;
 
-            if (ENV.MODE === "development") {
-                console.log("picktureLink : ", pinctureLink);
+            if (!error) {
+                // hébergement serveur static: 
+                const pirtureUrl = `http://${ENV.HOST}:${ENV.PORT}/assets/${ENV.PICTURE_PREFIX + filename}`;
+
+                // websocket: envoie client: image compréssé terminé: url
+                const data = {conpressOnePictureFinish: {pirtureUrl, name: filename}};
+                currentOperation.ws.send(JSON.stringify(data));
+                //décrémenter le nombre d'image restant à compresser
+                currentOperation.numberOfRemainigPicture -= 1;
+                // websocket: envoie client: fin de la compression de toutes les images
+                if (currentOperation.numberOfRemainigPicture <= 0) {
+                    currentOperation.ws.send(JSON.stringify({compressAllPicturesFinish: true}));
+                }
             }
-
-
-            // envoie de l'url par web socket
-            AllCompressPictures[compressPictureId].client.emit("conpressOnePictureFinish", JSON.stringify(pinctureLink));
-
-            //ancienne version format.js
-            // res.status(200).json({pictureLink: pinctureLink, filename : req.file.filename});
-
-            //décrémenter le nombre d'image restant à compresser
-            AllCompressPictures[compressPictureId].numberOfPictures -= 1;
-            console.log("NOMBRE RESTANT D IMAGE A COMPRESSER", AllCompressPictures[compressPictureId].numberOfPictures);
-            if (AllCompressPictures[compressPictureId].numberOfPictures <= 0) {
-                AllCompressPictures[compressPictureId].client.emit("compressAllPicturesFinish");
-
-                // A FAIRE: désabonnement du web socket
-
-            }
-
-        });
+        }
+    );
 };
 
-exports.jpgComp = (req, res, tcomp) => {
-    logFileReqReport(req);
-    compressPicture(req, res, tcomp);
+const downloadPicture = (req, res) => {
+    // récupéretion des données d'une opération client
+    const compressPictureId = req.body.compressPictureId;
+    const currentOperation = AllCompressPictures[compressPictureId];
+    
+    //enregistrement du nombre d'images téléchargées
+    currentOperation.numberOfPicturesDownload++;
+
+    // téléchargement de toutes les images terminé
+    if (currentOperation.numberOfPicturesDownload === currentOperation.numberOfPictures) {
+        //envois au client: téléchargement terminées
+        currentOperation.ws.send(JSON.stringify({downloadAllPicturesFinish: true}));
+    }
+    //reponse http: image téléchargé avec succès, compression en cours.
+    res.status(200).json({response: `compression de l'image: ${req.file.filename} en cour...`});
+
+    //Compression d'une image
+    compressPicture(currentOperation, req.body.compressRatio, req.file);
 };
 
-exports.pngComp = (req, res, tcomp) => {
+exports.jpgComp = (req, res) => {
     logFileReqReport(req);
-    compressPicture(req, res, tcomp);
+    downloadPicture(req, res);
 };
 
-exports.gifComp = (req, res, tcomp) => {
+exports.pngComp = (req, res) => {
     logFileReqReport(req);
-    compressPicture(req, res, tcomp);
+    downloadPicture(req, res);
 };
 
-exports.svgComp = (req, res, tcomp) => {
+exports.gifComp = (req, res) => {
     logFileReqReport(req);
-    compressPicture(req, res, tcomp);
+    downloadPicture(req, res);
+};
+
+exports.svgComp = (req, res) => {
+    logFileReqReport(req);
+    downloadPicture(req, res);
 };
 
