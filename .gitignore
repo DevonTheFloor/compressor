@@ -1,1 +1,6 @@
 node_modules
+.env
+.env.prod
+.env.dev
+comp-img
+temp

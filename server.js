@@ -1,10 +1,19 @@
-const http = require('http')
-const app = require('./app')
-const nport = 3333
+if (process.env.MODE !== "production") {
+    require("dotenv").config();
+}
 
+const http = require("http");
+const app = require("./app");
+// const ENV = require("./env");
+// eslint-disable-next-line no-undef
+app.set("port", process.env.PORT );
+const server = http.createServer(app);
+console.log(`Connecté au port ${process.env.PORT}`);
 
-app.set('port',process.env.PORT || nport);
-const server = http.createServer(app)
-console.log(`Connecté au port ${nport}`)
+server.listen( process.env.PORT);
 
-server.listen(process.env.PORT || nport)
+const WebSocket = require("ws");
+const wss = new WebSocket.Server({ port: 3334 });
+const { connection } = require("./webSocket/ws-connection");
+
+connection(wss);

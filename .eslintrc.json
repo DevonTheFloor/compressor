@@ -11,19 +11,19 @@
     "rules": {
         "indent": [
             "error",
-            2
+            4
         ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
+        // "linebreak-style": [
+        //     "error",
+        //     "unix"
+        // ],
         "quotes": [
             "error",
-            "single"
+            "double"
         ],
         "semi": [
             "error",
-            "never"
+            "always"
         ]
     }
 }
