@@ -58,7 +58,7 @@ exports.modify = (req, res) => {
     Repo
         .updateOne(
             {_id: req.params._id},
-            {...req.body, _id: req.param._id}
+            {...req.body, _id: req.params._id}
         )
         .then(() => {
             res.status(200).json({message: "Repository Updated"});

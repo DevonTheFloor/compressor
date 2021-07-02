@@ -1,4 +1,5 @@
 const compressImages = require("compress-images");
+const Picture = require("../models/picture");
 
 // eslint-disable-next-line no-undef
 const ENV = process.env;
@@ -63,7 +64,23 @@ const getExtentionFile = (mimetype) => {
     }
 };
 
-const compressPicture = (currentOperation, compressRatio, file) => {
+const createDataPicture = ( newPicture ) => {
+    return newPicture.save()
+        .then(() => console.log("savegarde des données d'une nouvelle image"))
+        .catch(error => console.log(error));
+};
+
+const updateDataPicture = (option) => {
+    Picture.updateOne(
+        {_id: option._id},
+        {...option},
+    )
+        .then(() => console.log("mise à jour des données d'une image"))
+        .catch(error => console.log(error));
+
+};
+
+const compressPicture = (currentOperation, compressRatio, file, dataPicture) => {
     const mimetype = file.mimetype;
     const filename = file.filename;
     const INPUT_path = `./${file.path}`;
@@ -90,8 +107,18 @@ const compressPicture = (currentOperation, compressRatio, file) => {
                 // hébergement serveur static: 
                 const pirtureUrl = `http://${ENV.HOST}:${ENV.PORT}/assets/${ENV.PICTURE_PREFIX + filename}`;
 
+                const newDataPicture = {
+                    ...dataPicture,
+                    url: pirtureUrl,
+                    size_in: statistic.size_in,
+                    size_output: statistic.size_output,
+                    percent: statistic.percent,
+                };
+                //mise à jour de la base de données
+                updateDataPicture(newDataPicture);
+
                 // websocket: envoie client: image compréssé terminé: url
-                const data = {conpressOnePictureFinish: {pirtureUrl, name: filename}};
+                const data = {conpressOnePictureFinish: newDataPicture};
                 currentOperation.ws.send(JSON.stringify(data));
                 //décrémenter le nombre d'image restant à compresser
                 currentOperation.numberOfRemainigPicture -= 1;
@@ -120,8 +147,26 @@ const downloadPicture = (req, res) => {
     //reponse http: image téléchargé avec succès, compression en cours.
     res.status(200).json({response: `compression de l'image: ${req.file.filename} en cour...`});
 
+    const dataPicture = {
+        user_id      : req.body.user_id,
+        repository_id: "_undefined",
+        name         : req.file.filename,
+        url          : "_null",
+        operation_id : compressPictureId,
+        size_in: 0,
+        size_output: 0,
+        compressRatio: req.body.compressRatio,
+        percent: 0,
+    };
+
+    const newPicture = new Picture(dataPicture);
+    dataPicture._id = newPicture._id;
+    createDataPicture(newPicture)
+        .then(() => compressPicture(currentOperation, req.body.compressRatio, req.file, dataPicture))
+        .catch(error => console.log(error));
+
     //Compression d'une image
-    compressPicture(currentOperation, req.body.compressRatio, req.file);
+    // compressPicture(currentOperation, req.body.compressRatio, req.file, dataPicture);
 };
 
 exports.jpgComp = (req, res) => {

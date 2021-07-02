@@ -4,7 +4,7 @@ const path = require("path");
 // route
 const formatRoutes = require("./routes/format");
 const formatSocketRoutes = require("./routes/formatSocket");
-const handleImagesRoutes = require("./routes/handleImages");
+const pictuereRoutes = require("./routes/picture");
 const userRoutes = require("./routes/auth");
 const repositoryRoutes = require("./routes/repository");
 
@@ -40,7 +40,7 @@ app.use("/api/onepic", formatRoutes);
 //formatSocket
 app.use("/api/onepic/multi", formatSocketRoutes);
 //handleImages
-app.use("/api/handleImages", handleImagesRoutes);
+app.use("/api/picture", pictuereRoutes);
 // repository
 app.use("/api/repository", repositoryRoutes);
 
@@ -50,7 +50,6 @@ app.use("/api/repository", repositoryRoutes);
 // *** START STATIC SERVE
 
 //picture compress
-
 // eslint-disable-next-line no-undef
 app.use("/assets", express.static(path.join(__dirname, ENV.FOLDER_PIC_COMPRESS)));
 
